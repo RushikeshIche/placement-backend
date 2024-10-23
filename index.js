@@ -3,7 +3,8 @@ require("dotenv").config()
 const cors = require("cors")
 const app = express()
 const http = require("http"); 
-
+const passport = require('passport');
+require('./config/passport');  // Import passport configuration
 
 app.use(express.json())
 const corsOptions = {
@@ -12,17 +13,21 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(passport.initialize());
+
 
 const dbconnection = require("./config/database")
 const router = require("./routes/router")
 const PORT= process.env.PORT || 3000;
 const cookieParser = require('cookie-parser');
+const adminRouter = require("./routes/adminAuthRouter");
 
 app.use(cookieParser());
 
 dbconnection();
 
 app.use("/api",router);
+app.use("/api/admin",adminRouter)
 
 app.all('*',(req,res,next)=>{
   const err = new Error(`Cant fint ${req.originalUrl} on the server `)
